@@ -24,7 +24,7 @@ bool UInventoryComponent::AddItem(FName ItemType, int32 Quantity)
 	TArray<InventoryChangeRequest> InventoryChangeRequests;
 	if (GetInventoryChangeRequestsForAdd(ItemType, Quantity, InventoryChangeRequests) != Quantity)
 	{
-		UE_LOG(LogInventoryComponent, Log, TEXT("Could not AddItem - item: %s quantity: %d"), *ItemType.ToString(), Quantity);
+		UE_LOG(LogInventoryComponent, Warning, TEXT("Could not AddItem - item: %s quantity: %d"), *ItemType.ToString(), Quantity);
 		return false;
 	}
 
@@ -50,7 +50,7 @@ bool UInventoryComponent::AddItemToSlot(FName ItemType, int32 Quantity, int32 Sl
 
 	if (!bSlotItemTypeOk || !bQuantityOk)
 	{
-		UE_LOG(LogInventoryComponent, Log, TEXT("Could not AddItemToSlot - item: %s quantity: %d slot: %d"), *ItemType.ToString(), Quantity, SlotIndex);
+		UE_LOG(LogInventoryComponent, Warning, TEXT("Could not AddItemToSlot - item: %s quantity: %d slot: %d"), *ItemType.ToString(), Quantity, SlotIndex);
 		return false;
 	}
 
@@ -68,7 +68,7 @@ bool UInventoryComponent::RemoveItemFromSlot(int32 SlotIndex, int32 Quantity)
 
 	if (InventoryItem->Quantity - Quantity < 0)
 	{
-		UE_LOG(LogInventoryComponent, Log, TEXT("Could not RemoveItemFromSlot - quantity: %d slot: %d"), Quantity, SlotIndex);
+		UE_LOG(LogInventoryComponent, Warning, TEXT("Could not RemoveItemFromSlot - quantity: %d slot: %d"), Quantity, SlotIndex);
 		return false;
 	}
 

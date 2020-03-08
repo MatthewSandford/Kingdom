@@ -6,8 +6,10 @@ DEFINE_LOG_CATEGORY(LogCreatureStatManagerComponent);
 
 UCreatureStatManagerComponent::UCreatureStatManagerComponent()
 {
-	AddStat(EStatTypeEnum::Health, 100);
-	AddStat(EStatTypeEnum::MaxHealth, 100);
+	AddStat(EStatTypeEnum::Health, 0);
+	AddStat(EStatTypeEnum::MaxHealth, 0);
+	AddStat(EStatTypeEnum::Damage, 0);
+	AddStat(EStatTypeEnum::AutoAttackRange, 0);
 }
 
 float UCreatureStatManagerComponent::GetHealth()

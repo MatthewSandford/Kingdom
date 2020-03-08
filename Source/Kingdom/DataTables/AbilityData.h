@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
+#include "Enums/StatTypeEnum.h"
+#include "Game/Abilities/Ability.h"
+#include "StatScaling.h"
 
 #include "AbilityData.generated.h"
 
@@ -17,4 +20,13 @@ struct FAbilityData : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText Description;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Cooldown;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FStatScaling> Cost;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class UAbility> Ability;
 };

@@ -12,6 +12,9 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogAbility, Log, All);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActivateAbilityEvent, FName, AbilityName);
+
+struct FAbilityData;
 class UStatManagerComponent;
 
 UCLASS(Blueprintable)
@@ -21,35 +24,24 @@ class KINGDOM_API UAbility : public UTask
 
 public:
 
-	// --- Public Variables ---
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Cooldown;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<EStatTypeEnum, float> Cost;
-
-	// --- Public Functions ---
-
 	UAbility();
 	~UAbility();
 
-	UFUNCTION(BlueprintCallable)
-	float GetCooldownTimer() const { return CooldownTimer; }
-
 	virtual bool CanExecute_Implementation() override final;
 	virtual void Execute_Implementation() override final;
-	void Tick(float DeltaTime);
+
+	EAbilityTypeEnum GetAbilityType() const { return AbilityType; }
+	static bool CanPayCosts(FName AbilityName, const AActor* Actor, const UObject* Caller);
+	static const FAbilityData* GetAbilityData(FName AbilityName, const UObject* Caller);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName AbilityName;
+
+	FActivateAbilityEvent ActivateAbilityEvent;
 
 protected:
 
-	// --- Protected Variables ---
 	EAbilityTypeEnum AbilityType;
-
-	// --- Protected Functions ---
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void PreActivateAbility();
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ActivateAbility();
@@ -58,14 +50,4 @@ protected:
 	EActivateAbilityResultEnum CanActivate();
 
 	virtual EActivateAbilityResultEnum CanActivate_Implementation() { return EActivateAbilityResultEnum::Success; };
-
-private:
-
-	// --- Private Variables ---
-	float CooldownTimer;
-
-	// --- Private Functions ---
-	bool HasCosts() const;
-	void ReduceCooldown(float DeltaTime);
-	UStatManagerComponent* GetActorStatManagerComponent() const;
 };

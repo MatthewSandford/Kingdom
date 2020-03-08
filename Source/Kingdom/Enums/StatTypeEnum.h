@@ -7,6 +7,8 @@
 UENUM(BlueprintType)	
 enum class EStatTypeEnum : uint8
 {
-	Health 		UMETA(DisplayName = "Health"),
-	MaxHealth 	UMETA(DisplayName = "MaxHealth")
+	Health 				UMETA(DisplayName = "Health"),
+	MaxHealth 			UMETA(DisplayName = "MaxHealth"),
+	Damage				UMETA(DisplayName = "Damage"),
+	AutoAttackRange		UMETA(DisplayName = "Auto Attack Range")
 };

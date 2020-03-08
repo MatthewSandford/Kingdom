@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "DataTables/StatScaling.h"
 #include "Enums/StatTypeEnum.h"
 #include "StatModifiers/StatModifier.h"
 #include "StatusEffects/StatusEffect.h"
 #include "Misc/Constants.h"
 #include "Misc/Types.h"
+
 #include "StatManagerComponent.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogStatManagerComponent, Log, All);
@@ -43,11 +45,16 @@ public:
 	bool RemoveStat(EStatTypeEnum StatType);
 
 	UFUNCTION(BlueprintCallable)
-	bool GetBaseStatValue(EStatTypeEnum StatType, float& OutValue);
+	bool GetBaseStatValue(EStatTypeEnum StatType, float& OutValue) const;
 
 	UFUNCTION(BlueprintCallable)
-	bool GetModifiedStatValue(EStatTypeEnum StatType, float& OutValue);
+	bool GetModifiedStatValue(EStatTypeEnum StatType, float& OutValue) const;
 
+	UFUNCTION(BlueprintCallable)
+	bool GetBonusStatValue(EStatTypeEnum StatType, float& OutValue) const;
+
+	UFUNCTION(BlueprintCallable)
+	bool GetStatScalingValue(const FStatScaling& Scaling, float& OutValue) const;
 
 	// Status Effects:
 

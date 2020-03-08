@@ -49,9 +49,9 @@ bool UStatManagerComponent::DecrementStat(EStatTypeEnum StatType, float Value)
 	}
 	return false;
 }
-bool UStatManagerComponent::GetBaseStatValue(EStatTypeEnum StatType, float& OutValue)
+bool UStatManagerComponent::GetBaseStatValue(EStatTypeEnum StatType, float& OutValue) const
 {
-	if (float* StatValue = Stats.Find(StatType))
+	if (const float* StatValue = Stats.Find(StatType))
 	{
 		OutValue = *StatValue;
 		return true;
@@ -61,7 +61,7 @@ bool UStatManagerComponent::GetBaseStatValue(EStatTypeEnum StatType, float& OutV
 	return false;
 }
 
-bool UStatManagerComponent::GetModifiedStatValue(EStatTypeEnum StatType, float& OutValue)
+bool UStatManagerComponent::GetModifiedStatValue(EStatTypeEnum StatType, float& OutValue) const
 {
 	float StatValue = 0;
 	if (!GetBaseStatValue(StatType, StatValue))
@@ -69,7 +69,7 @@ bool UStatManagerComponent::GetModifiedStatValue(EStatTypeEnum StatType, float& 
 		return false;
 	}
 
-	if (ModifierPriorityMap* PriorityMap = StatModifiers.Find(StatType))
+	if (const ModifierPriorityMap* PriorityMap = StatModifiers.Find(StatType))
 	{
 		for (const auto& PriorityMapPair : *PriorityMap)
 		{
@@ -83,6 +83,59 @@ bool UStatManagerComponent::GetModifiedStatValue(EStatTypeEnum StatType, float& 
 	OutValue = StatValue;
 	return true;
 }
+
+bool UStatManagerComponent::GetBonusStatValue(EStatTypeEnum StatType, float& OutValue) const
+{
+	float StatValue = 0;
+	if (!GetBaseStatValue(StatType, StatValue))
+	{
+		return false;
+	}
+
+	float ModifiedStatValue = 0;
+	if (!GetModifiedStatValue(StatType, StatValue))
+	{
+		return false;
+	}
+
+	return ModifiedStatValue - StatValue;
+}
+
+bool UStatManagerComponent::GetStatScalingValue(const FStatScaling& Scaling, float& OutValue) const
+{
+	switch (Scaling.Scaling)
+	{
+		case EStatScalingEnum::Flat:
+		{
+			return Scaling.Value;
+		}
+		break;
+
+		case EStatScalingEnum::PercentageBase:
+		{
+			GetBaseStatValue(Scaling.StatType, OutValue);
+			OutValue = Scaling.Value/100.0f;
+		}
+		break;
+
+		case EStatScalingEnum::PercentageModified:
+		{
+			GetModifiedStatValue(Scaling.StatType, OutValue);
+			OutValue *= Scaling.Value / 100.0f;
+		}
+		break;
+
+		case EStatScalingEnum::PercentageBonus:
+		{
+			GetBonusStatValue(Scaling.StatType, OutValue);
+			OutValue *= Scaling.Value / 100.0f;
+		}
+		break;
+	}
+
+	return true;
+}
+
 bool UStatManagerComponent::RemoveStat(EStatTypeEnum StatType)
 {
 	return Stats.Remove(StatType) > 0;

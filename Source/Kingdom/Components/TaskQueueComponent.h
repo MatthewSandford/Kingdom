@@ -18,6 +18,7 @@ class KINGDOM_API UTaskQueueComponent : public UActorComponent
 
 public:	
 	UTaskQueueComponent();
+	~UTaskQueueComponent();
 
 	UFUNCTION(BlueprintCallable)
 	void AddTask(UTask* Task);

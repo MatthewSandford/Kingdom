@@ -17,6 +17,9 @@ public:
 	UKingdomGameInstance(const FObjectInitializer& ObjectInitializer);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UDataTable* CreatureStatsDataTable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UDataTable* AbilityDataTable;
 	
 };

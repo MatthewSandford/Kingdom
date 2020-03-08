@@ -10,6 +10,10 @@ UTaskQueueComponent::UTaskQueueComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
+UTaskQueueComponent::~UTaskQueueComponent()
+{
+}
+
 void UTaskQueueComponent::AddTask(UTask* Task)
 {
 	if (!Task)
