@@ -12,7 +12,7 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogAbility, Log, All);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActivateAbilityEvent, FName, AbilityName);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActivateAbilityEvent, UAbility*, AbilityTask);
 
 struct FAbilityData;
 class UStatManagerComponent;
@@ -26,6 +26,11 @@ public:
 
 	UAbility();
 	~UAbility();
+
+	UFUNCTION(BlueprintNativeEvent)
+	float GetCooldown();
+
+	virtual float GetCooldown_Implementation();
 
 	virtual bool CanExecute_Implementation() override final;
 	virtual void Execute_Implementation() override final;
@@ -49,5 +54,6 @@ protected:
 	UFUNCTION(BlueprintNativeEvent)
 	EActivateAbilityResultEnum CanActivate();
 
+	static UStatManagerComponent* GetStatManagerComponent(const AActor* Actor);
 	virtual EActivateAbilityResultEnum CanActivate_Implementation() { return EActivateAbilityResultEnum::Success; };
 };

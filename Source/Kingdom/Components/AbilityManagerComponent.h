@@ -15,9 +15,9 @@ class KINGDOM_API UAbilityManagerComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-	struct Ability
+	struct AbilityTracker
 	{
-		Ability()
+		AbilityTracker()
 			: Timer(0)
 		{
 		}
@@ -32,13 +32,19 @@ public:
 	UAbilityManagerComponent();
 
 	UFUNCTION(BlueprintCallable)
-	UAbility* GetAbilityTask(int32 Index);
+	UAbility* GetAbilityTaskToCastByName(FName AbilityName);
+
+	UFUNCTION(BlueprintCallable)
+	UAbility* GetAbilityTaskToCastByIndex(int32 Index);
 
 	UFUNCTION(BlueprintCallable)
 	int32 AddAbility(FName AbilityName);
 
 	UFUNCTION(BlueprintCallable)
-	float GetCooldownTimer(int32 Index) const;
+	float GetCooldownTimerByName(FName AbilityName);
+
+	UFUNCTION(BlueprintCallable)
+	float GetCooldownTimerByIndex(int32 Index);
 
 	UFUNCTION(BlueprintCallable)
 	void SetTargets(const AActor* InTargetActor, FVector InTargetLocation);
@@ -48,13 +54,17 @@ public:
 
 private:
 
-	Ability* GetAbility(FName AbilityName);
+	AbilityTracker* GetAbilityTracker(int32 Index);
+	AbilityTracker* GetAbilityTracker(FName AbilityName);
+	bool CanCastAbility(const AbilityTracker& Ability);
+	UAbility* GetAbilityTaskToCast(const AbilityTracker& Ability);
+
 	void TickAbilities(float DeltaTime);
 
 	UFUNCTION()
-	void AbilityActivated(FName AbilityName);
+	void AbilityActivated(UAbility* AbilityTask);
 
 	FVector TargetLocation;
 	const AActor* TargetActor;
-	TArray<Ability> Abilities;
+	TArray<AbilityTracker> Abilities;
 };

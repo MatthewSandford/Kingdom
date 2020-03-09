@@ -22,50 +22,56 @@ int32 UAbilityManagerComponent::AddAbility(FName AbilityName)
 		return -1;
 	}
 
-	Ability NewAbility;
-	NewAbility.AbilityName = AbilityName;
-	NewAbility.Cooldown = AbilityData->Cooldown;
-	NewAbility.AbilityTask = AbilityData->Ability;
+	AbilityTracker NewAbilityTracker;
+	NewAbilityTracker.AbilityName = AbilityName;
+	NewAbilityTracker.Cooldown = AbilityData->Cooldown;
+	NewAbilityTracker.AbilityTask = AbilityData->Ability;
 
-	return Abilities.Add(NewAbility);
+	return Abilities.Add(NewAbilityTracker);
 }
 
-UAbility* UAbilityManagerComponent::GetAbilityTask(int32 Index)
+UAbility* UAbilityManagerComponent::GetAbilityTaskToCastByName(FName AbilityName)
 {
-	if (Index >= Abilities.Num() && Index < 0)
+	AbilityTracker* Ability = GetAbilityTracker(AbilityName);
+	if (!CanCastAbility(*Ability))
 	{
-		UE_LOG(LogAbilityManageComponent, Error, TEXT("Invalid index: %d"), Index);
-		return false;
+		return nullptr;
 	}
 
-	const Ability& Ability = Abilities[0];
-	UAbility* AbilityTask = NewObject<UAbility>(this, Ability.AbilityTask);
-	AbilityTask->Controller = Cast<APawn>(GetOwner())->GetController();
-	AbilityTask->ActivateAbilityEvent.AddDynamic(this, &UAbilityManagerComponent::AbilityActivated);
-
-	return AbilityTask;
+	return GetAbilityTaskToCast(*Ability);
 }
 
-float UAbilityManagerComponent::GetCooldownTimer(int32 Index) const
+UAbility* UAbilityManagerComponent::GetAbilityTaskToCastByIndex(int32 Index)
 {
-	if (Index >= 0 && Index < Abilities.Num())
+	AbilityTracker* Ability = GetAbilityTracker(Index);
+	if (Ability == nullptr)
 	{
-		UE_LOG(LogAbilityManageComponent, Error, TEXT("Invalid index: %d"), Index);
-		return 0.0f;
+		return nullptr;
 	}
-	return Abilities[Index].Timer;
+
+	return GetAbilityTaskToCast(*Ability);
 }
 
-void UAbilityManagerComponent::TickAbilities(float DeltaTime)
+float UAbilityManagerComponent::GetCooldownTimerByName(FName AbilityName)
 {
-	for (const Ability& Ability : Abilities)
+	const AbilityTracker* Ability = GetAbilityTracker(AbilityName);
+	if (Ability == nullptr)
 	{
+		return -1;
 	}
+
+	return Ability->Timer;
 }
 
-void UAbilityManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+float UAbilityManagerComponent::GetCooldownTimerByIndex(int32 Index)
 {
-	TickAbilities(DeltaTime);
+	const AbilityTracker* Ability = GetAbilityTracker(Index);
+	if (Ability == nullptr)
+	{
+		return -1;
+	}
+
+	return Ability->Timer;
 }
 
 void UAbilityManagerComponent::SetTargets(const AActor* InTargetActor, FVector InTargetLocation)
@@ -74,9 +80,36 @@ void UAbilityManagerComponent::SetTargets(const AActor* InTargetActor, FVector I
 	TargetLocation = InTargetLocation;
 }
 
-UAbilityManagerComponent::Ability* UAbilityManagerComponent::GetAbility(FName AbilityName)
+void UAbilityManagerComponent::TickAbilities(float DeltaTime)
 {
-	for (Ability& Ability : Abilities)
+	for (AbilityTracker& Ability : Abilities)
+	{
+		if (Ability.Timer > 0)
+		{
+			Ability.Timer -= DeltaTime;
+			Ability.Timer = Ability.Timer < 0 ? 0 : Ability.Timer;
+		}
+	}
+}
+
+void UAbilityManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	TickAbilities(DeltaTime);
+}
+
+UAbilityManagerComponent::AbilityTracker* UAbilityManagerComponent::GetAbilityTracker(int32 Index)
+{
+	if (Index >= Abilities.Num() && Index < 0)
+	{
+		UE_LOG(LogAbilityManageComponent, Error, TEXT("Invalid index: %d"), Index);
+		return nullptr;
+	}
+	return &Abilities[Index];
+}
+
+UAbilityManagerComponent::AbilityTracker* UAbilityManagerComponent::GetAbilityTracker(FName AbilityName)
+{
+	for (AbilityTracker& Ability : Abilities)
 	{
 		if (Ability.AbilityName == AbilityName)
 		{
@@ -86,17 +119,36 @@ UAbilityManagerComponent::Ability* UAbilityManagerComponent::GetAbility(FName Ab
 	return nullptr;
 }
 
-void UAbilityManagerComponent::AbilityActivated(FName AbilityName)
+bool UAbilityManagerComponent::CanCastAbility(const AbilityTracker& Ability)
 {
-	Ability* Ability = GetAbility(AbilityName);
+	return Ability.Timer == 0 && UAbility::CanPayCosts(Ability.AbilityName, GetOwner(), this);
+}
+
+UAbility* UAbilityManagerComponent::GetAbilityTaskToCast(const AbilityTracker& Ability)
+{
+	if (!CanCastAbility(Ability))
+	{
+		return nullptr;
+	}
+
+	UAbility* AbilityTask = NewObject<UAbility>(GetOwner(), Ability.AbilityTask);
+	AbilityTask->Controller = Cast<APawn>(GetOwner())->GetController();
+	AbilityTask->ActivateAbilityEvent.AddDynamic(this, &UAbilityManagerComponent::AbilityActivated);
+
+	return AbilityTask;
+}
+
+void UAbilityManagerComponent::AbilityActivated(UAbility* AbilityTask)
+{
+	AbilityTracker* Ability = GetAbilityTracker(AbilityTask->AbilityName);
 	if (Ability == nullptr)
 	{
 		return;
 	}
 
-	Ability->Timer = Ability->Cooldown;
+	Ability->Timer = AbilityTask->GetCooldown();
 
-	const FAbilityData* AbilityData = UAbility::GetAbilityData(AbilityName, this);
+	const FAbilityData* AbilityData = UAbility::GetAbilityData(AbilityTask->AbilityName, this);
 	if (AbilityData == nullptr)
 	{
 		return;

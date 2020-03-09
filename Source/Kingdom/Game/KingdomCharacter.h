@@ -10,7 +10,7 @@
 DECLARE_LOG_CATEGORY_EXTERN(LogKingdomCharacter, Log, All);
 
 class UAbilityManagerComponent;
-class UCreatureStatManagerComponent;
+class UStatManagerComponent;
 class UInventoryComponent;
 class UTaskQueueComponent;
 class UTeamComponent;
@@ -27,7 +27,7 @@ public:
 	FName CharacterType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UCreatureStatManagerComponent* StatManager;
+	UStatManagerComponent* StatManager;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UInventoryComponent* Inventory;

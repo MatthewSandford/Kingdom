@@ -46,7 +46,7 @@ void UAbility::Execute_Implementation()
 	}
 
 	ActivateAbility();
-	ActivateAbilityEvent.Broadcast(AbilityName);
+	ActivateAbilityEvent.Broadcast(this);
 }
 
  bool UAbility::CanPayCosts(FName AbilityName, const AActor* Actor, const UObject* Caller)
@@ -57,23 +57,9 @@ void UAbility::Execute_Implementation()
 		return false;
 	}
 
-	TArray<UStatManagerComponent*> OwnedComponents;
-	Actor->GetComponents<UStatManagerComponent>(OwnedComponents);
-
-	if (OwnedComponents.Num() != 1)
-	{
-		UE_LOG(LogAbility, Error, TEXT("Owning actor does not have the correct number of stat manager components"));
-		return false;
-	}
-
-	const UStatManagerComponent* StatManagerComponent = OwnedComponents[0];
-	if (StatManagerComponent == nullptr)
-	{
-		return false;
-	}
+	const UStatManagerComponent* StatManagerComponent = GetStatManagerComponent(Actor);
 
 	const FAbilityData* AbilityData = GetAbilityData(AbilityName, Caller);
-
 	if (AbilityData == nullptr)
 	{
 		return false;
@@ -95,6 +81,37 @@ void UAbility::Execute_Implementation()
 
 	return true;
 }
+
+ float UAbility::GetCooldown_Implementation()
+ {
+	 const FAbilityData* AbilityData = GetAbilityData(AbilityName, this);
+	 if (AbilityData == nullptr)
+	 {
+		 return 0.0f;
+	 }
+
+	 const AActor* Caster = Controller->GetPawn();
+	 const UStatManagerComponent* StatManagerComponent = GetStatManagerComponent(Caster);
+
+	 float CooldownReduction;
+	 StatManagerComponent->GetModifiedStatValue(EStatTypeEnum::CooldownReduction, CooldownReduction);
+
+	 return AbilityData->Cooldown * CooldownReduction / 100.0f;
+ }
+
+ UStatManagerComponent* UAbility::GetStatManagerComponent(const AActor* Actor)
+ {
+	 TArray<UStatManagerComponent*> OwnedComponents;
+	 Actor->GetComponents<UStatManagerComponent>(OwnedComponents);
+
+	 if (OwnedComponents.Num() != 1)
+	 {
+		 UE_LOG(LogAbility, Error, TEXT("Owning actor does not have the correct number of stat manager components"));
+		 return false;
+	 }
+
+	 return OwnedComponents[0];
+ }
 
 const FAbilityData* UAbility::GetAbilityData(FName AbilityName, const UObject* Caller)
 {

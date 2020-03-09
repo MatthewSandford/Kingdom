@@ -2,7 +2,7 @@
 
 #include "KingdomCharacter.h"
 #include "Components/AbilityManagerComponent.h"
-#include "Components/CreatureStatManagerComponent.h"
+#include "Components/StatManagerComponent.h"
 #include "Components/InventoryComponent.h"
 #include "Components/TaskQueueComponent.h"
 #include "Components/TeamComponent.h"
@@ -26,7 +26,7 @@ void AKingdomCharacter::BeginPlay()
 
 void AKingdomCharacter::InitialiseComponents()
 {
-	StatManager = CreateDefaultSubobject<UCreatureStatManagerComponent>(TEXT("StatManager"));
+	StatManager = CreateDefaultSubobject<UStatManagerComponent>(TEXT("StatManager"));
 	Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 	Team = CreateDefaultSubobject<UTeamComponent>(TEXT("Team"));
 	TaskQueue = CreateDefaultSubobject<UTaskQueueComponent>(TEXT("TaskQueue"));
@@ -55,8 +55,10 @@ void AKingdomCharacter::SetupStatManager()
 		return;
 	}
 
-	StatManager->SetStat(EStatTypeEnum::MaxHealth, CreatureSetupData->MaxHealth);
-	StatManager->SetStat(EStatTypeEnum::Health, CreatureSetupData->MaxHealth);
-	StatManager->SetStat(EStatTypeEnum::Damage, CreatureSetupData->Damage);
-	StatManager->SetStat(EStatTypeEnum::AutoAttackRange, CreatureSetupData->AutoAttackRange);
+	StatManager->AddStat(EStatTypeEnum::MaxHealth, CreatureSetupData->MaxHealth);
+	StatManager->AddStat(EStatTypeEnum::Health, CreatureSetupData->MaxHealth);
+	StatManager->AddStat(EStatTypeEnum::Damage, CreatureSetupData->Damage);
+	StatManager->AddStat(EStatTypeEnum::AttackSpeed, CreatureSetupData->AttackSpeed);
+	StatManager->AddStat(EStatTypeEnum::AutoAttackRange, CreatureSetupData->AutoAttackRange);
+	StatManager->AddStat(EStatTypeEnum::CooldownReduction, CreatureSetupData->CooldownReduction);
 }

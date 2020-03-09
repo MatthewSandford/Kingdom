@@ -10,5 +10,7 @@ enum class EStatTypeEnum : uint8
 	Health 				UMETA(DisplayName = "Health"),
 	MaxHealth 			UMETA(DisplayName = "MaxHealth"),
 	Damage				UMETA(DisplayName = "Damage"),
-	AutoAttackRange		UMETA(DisplayName = "Auto Attack Range")
+	AttackSpeed			UMETA(DisplayName = "Attack Speed"),
+	AutoAttackRange		UMETA(DisplayName = "Auto Attack Range"),
+	CooldownReduction	UMETA(DisplayName = "CooldownReduction")
 };

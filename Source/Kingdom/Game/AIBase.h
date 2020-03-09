@@ -9,7 +9,7 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogAIBase, Log, All);
 
-class UCreatureStatManagerComponent;
+class UStatManagerComponent;
 class UInventoryComponent;
 class UTaskQueueComponent;
 class UTeamComponent;
@@ -23,19 +23,19 @@ public:
 	AAIBase();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FName CharacterType;
+	FName CharacterType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UCreatureStatManagerComponent* StatManager;
+	UStatManagerComponent* StatManager;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UInventoryComponent* Inventory;
+	UInventoryComponent* Inventory;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UTaskQueueComponent* TaskQueue;
+	UTaskQueueComponent* TaskQueue;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UTeamComponent* Team;
+	UTeamComponent* Team;
 
 protected:
 	virtual void BeginPlay() override;

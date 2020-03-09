@@ -16,8 +16,14 @@ struct FCreatureSetupData : public FTableRowBase
 	float MaxHealth;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float Damage;
+	float Damage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float AttackSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AutoAttackRange;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CooldownReduction;
 };

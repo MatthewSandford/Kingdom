@@ -76,6 +76,8 @@ public:
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
 private:
+
+
 	StatMap Stats;
 	TArray<UStatusEffect*> StatusEffects;
 	StatModifierMap StatModifiers;

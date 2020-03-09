@@ -4,9 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Class.h"
-#include "GameFramework/Actor.h"
-#include "GameFramework/Controller.h"
+
 #include "Task.generated.h"
+
+class AController;
 
 UCLASS(Blueprintable)
 class KINGDOM_API UTask : public UObject
@@ -48,7 +49,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void Cancel();
 
-	// When adding this task to the task queue should it be executed immediatly
+	// When adding this task to the task queue should it be executed immediately
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool ClearsTaskQueue = true;
 

@@ -67,7 +67,7 @@ void UTaskQueueComponent::TickComponent(float DeltaTime, enum ELevelTick TickTyp
 	if (Queue.Num() != 0)
 	{
 		UTask* Task = Queue[0];
-		if (Task->HasFinished())
+		if (Task != nullptr && Task->HasFinished())
 		{
 			Queue.Remove(Task);
 			if (Queue.Num() != 0)
